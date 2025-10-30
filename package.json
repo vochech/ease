@@ -7,7 +7,7 @@
   "dev:webpack": "cross-env NEXT_TURBOPACK=false next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint --config .eslintrc.json ."
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",
