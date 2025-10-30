@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "dev:webpack": "cross-env NEXT_TURBOPACK=false next dev",
+  "dev": "cross-env NEXT_TURBOPACK=false next dev",
+  "dev:webpack": "cross-env NEXT_TURBOPACK=false next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
