@@ -9,10 +9,10 @@ import { supabaseServer } from "../../../../lib/supabaseServer";
  */
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const supabase = await supabaseServer();
 
     const { data, error } = await supabase
@@ -54,10 +54,10 @@ export async function GET(
  */
 export async function PATCH(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await req.json();
     const supabase = await supabaseServer();
 
@@ -118,10 +118,10 @@ export async function PATCH(
  */
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const supabase = await supabaseServer();
 
     // First, get the project to find its org_id
