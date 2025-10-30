@@ -135,6 +135,31 @@ BEGIN
 END;
 $$;
 
+-- 2c) Verify critical columns exist before creating policies
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_schema = 'public'
+    AND table_name = 'projects'
+    AND column_name = 'org_id'
+  ) THEN
+    RAISE EXCEPTION 'projects.org_id column does not exist. Migration 2b may have failed.';
+  END IF;
+  
+  IF NOT EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_schema = 'public'
+    AND table_name = 'projects'
+    AND column_name = 'status'
+  ) THEN
+    RAISE EXCEPTION 'projects.status column does not exist. Migration 2b may have failed.';
+  END IF;
+END;
+$$;
+
 -- 3) Row Level Security
 ALTER TABLE public.organizations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.org_members  ENABLE ROW LEVEL SECURITY;
