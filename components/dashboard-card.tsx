@@ -12,20 +12,18 @@ type DashboardCardProps = {
 
 export function DashboardCard({ title, description, value, action, children }: DashboardCardProps) {
   return (
-    <div className="rounded-xl border bg-white p-4 shadow-sm hover:shadow-md transition">
-      <header className="flex items-start justify-between gap-3">
-        <div>
-          <h3 className="text-sm font-medium text-gray-700">{title}</h3>
+    <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md transition">
+      <header className="flex items-start justify-between gap-3 mb-2">
+        <div className="flex-1">
+          <h3 className="text-sm font-medium text-gray-600">{title}</h3>
           {description && <p className="text-xs text-gray-500 mt-1">{description}</p>}
         </div>
-        <div className="flex items-center gap-2">
-          {action}
-          {value !== undefined && (
-            <div className="text-2xl font-semibold text-gray-900">{value}</div>
-          )}
-        </div>
+        {action}
       </header>
-      {children && <div className="mt-3 text-sm text-gray-500">{children}</div>}
+      {value !== undefined && (
+        <div className="text-3xl font-bold text-gray-900 mt-2">{value}</div>
+      )}
+      {children && <div className="mt-4 text-sm text-gray-600">{children}</div>}
     </div>
   );
 }

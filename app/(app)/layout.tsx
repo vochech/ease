@@ -9,14 +9,19 @@ export const metadata: Metadata = {
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-dvh bg-gray-50">
-      <div className="flex">
-        <aside className="hidden md:block">
+    <div className="min-h-screen bg-gray-50">
+      <div className="flex h-screen">
+        {/* Sidebar - fixed width, hidden on mobile */}
+        <aside className="hidden md:flex w-64 flex-shrink-0 border-r bg-white">
           <SidebarNav />
         </aside>
-        <div className="flex-1">
+        
+        {/* Main content area */}
+        <div className="flex flex-1 flex-col overflow-hidden">
           <Topbar title="Dashboard" />
-          <main className="p-6">{children}</main>
+          <main className="flex-1 overflow-y-auto p-6">
+            {children}
+          </main>
         </div>
       </div>
     </div>
