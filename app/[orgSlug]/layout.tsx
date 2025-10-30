@@ -18,7 +18,11 @@ export default async function OrgLayout({ children, params }: OrgLayoutProps) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
+  // DEV MODE: Allow bypassing auth if no user exists and dev mode is enabled
+  const isDev = process.env.NODE_ENV === "development";
+  const bypassAuth = isDev && process.env.BYPASS_AUTH === "true";
+
+  if (!user && !bypassAuth) {
     redirect(`/login?redirect=/${orgSlug}`);
   }
 
@@ -33,11 +37,21 @@ export default async function OrgLayout({ children, params }: OrgLayoutProps) {
     redirect("/404");
   }
 
-  // Get user's membership
-  const membership = await getOrgMembership(org.id);
+  // Get user's membership (or mock in dev bypass mode)
+  let membership;
+  let userId: string;
 
-  if (!membership) {
-    redirect(`/join/${orgSlug}`);
+  if (bypassAuth && !user) {
+    // DEV MODE: Create mock membership as owner
+    membership = { role: "owner" as const };
+    userId = "dev-user-id";
+  } else {
+    membership = await getOrgMembership(org.id);
+    userId = user!.id;
+
+    if (!membership) {
+      redirect(`/join/${orgSlug}`);
+    }
   }
 
   return (
@@ -46,7 +60,7 @@ export default async function OrgLayout({ children, params }: OrgLayoutProps) {
         orgId: org.id,
         orgSlug: org.slug,
         orgName: org.name,
-        userId: user.id,
+        userId,
         userRole: membership.role,
       }}
     >
