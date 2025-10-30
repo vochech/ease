@@ -1,6 +1,9 @@
 -- Example migration for Ease scaffold
 -- Apply this SQL in your Supabase project's SQL editor or via psql.
 
+-- Extensions
+CREATE EXTENSION IF NOT EXISTS pgcrypto; -- for gen_random_uuid()
+
 -- Organizations
 CREATE TABLE IF NOT EXISTS organizations (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -14,7 +17,7 @@ CREATE TABLE IF NOT EXISTS organizations (
 CREATE TABLE IF NOT EXISTS org_members (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   org_id uuid REFERENCES organizations(id) ON DELETE CASCADE NOT NULL,
-  user_id uuid NOT NULL, -- References auth.users
+  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL, -- References auth.users
   role text NOT NULL CHECK (role IN ('owner', 'manager', 'member', 'viewer', 'invited')),
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now(),
