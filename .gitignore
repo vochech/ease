@@ -1,0 +1,14 @@
+# Node / Next
+node_modules
+.next
+out
+dist
+
+# Env
+.env*
+!.env.example
+
+# OS / Editor
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
