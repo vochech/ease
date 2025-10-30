@@ -53,10 +53,9 @@ CREATE TABLE IF NOT EXISTS public.meetings (
   updated_at  timestamptz DEFAULT now()
 );
 
--- 2) Indexes
+-- 2) Indexes (excluding projects.org_id which is added in section 2b after column exists)
 CREATE INDEX IF NOT EXISTS idx_org_members_org_id   ON public.org_members(org_id);
 CREATE INDEX IF NOT EXISTS idx_org_members_user_id  ON public.org_members(user_id);
-CREATE INDEX IF NOT EXISTS idx_projects_org_id      ON public.projects(org_id);
 CREATE INDEX IF NOT EXISTS idx_tasks_project_id     ON public.tasks(project_id);
 CREATE INDEX IF NOT EXISTS idx_meetings_project_id  ON public.meetings(project_id);
 
