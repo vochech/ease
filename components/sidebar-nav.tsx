@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React from "react";
+import React, { useState } from "react";
 
 const items = [
   { name: "Home", href: "/" },
@@ -62,9 +62,24 @@ function Icon({ name }: { name: string }) {
 
 export default function SidebarNav() {
   const pathname = usePathname() || "/";
+  const [expanded, setExpanded] = useState(false);
 
   return (
     <nav className="flex flex-col gap-2 p-4 text-sm">
+      <div className="flex items-center justify-between sm:hidden mb-2">
+        <div className="text-sm font-semibold">Ease</div>
+        <button
+          aria-expanded={expanded}
+          onClick={() => setExpanded((s) => !s)}
+          className="p-2 rounded-md hover:bg-gray-100"
+          aria-label="Toggle sidebar"
+        >
+          {/* hamburger */}
+          <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path strokeWidth="1.5" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
       {items.map((item) => {
         const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
         return (
@@ -76,7 +91,7 @@ export default function SidebarNav() {
             }`}
           >
             <Icon name={item.name} />
-            <span className="hidden sm:inline">{item.name}</span>
+            <span className={`${expanded ? "inline" : "hidden"} sm:inline`}>{item.name}</span>
           </Link>
         );
       })}
