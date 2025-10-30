@@ -62,22 +62,37 @@ CREATE INDEX IF NOT EXISTS idx_meetings_project_id  ON public.meetings(project_i
 
 -- 2b) Upgrades for existing databases (when tables already exist without newer columns)
 -- Ensure projects.org_id exists, has FK and index
-ALTER TABLE public.projects
-  ADD COLUMN IF NOT EXISTS org_id uuid;
-
 DO $$
 BEGIN
+  -- Add org_id column if it doesn't exist
   IF NOT EXISTS (
     SELECT 1
-    FROM   information_schema.table_constraints tc
-    WHERE  tc.table_schema = 'public'
-    AND    tc.table_name   = 'projects'
-    AND    tc.constraint_type = 'FOREIGN KEY'
-    AND    tc.constraint_name = 'projects_org_id_fkey'
+    FROM information_schema.columns
+    WHERE table_schema = 'public'
+    AND table_name = 'projects'
+    AND column_name = 'org_id'
+  ) THEN
+    ALTER TABLE public.projects ADD COLUMN org_id uuid;
+    RAISE NOTICE 'Added projects.org_id column';
+  ELSE
+    RAISE NOTICE 'projects.org_id already exists';
+  END IF;
+
+  -- Add FK constraint if it doesn't exist
+  IF NOT EXISTS (
+    SELECT 1
+    FROM information_schema.table_constraints tc
+    WHERE tc.table_schema = 'public'
+    AND tc.table_name = 'projects'
+    AND tc.constraint_type = 'FOREIGN KEY'
+    AND tc.constraint_name = 'projects_org_id_fkey'
   ) THEN
     ALTER TABLE public.projects
       ADD CONSTRAINT projects_org_id_fkey
       FOREIGN KEY (org_id) REFERENCES public.organizations(id) ON DELETE CASCADE;
+    RAISE NOTICE 'Added projects.org_id FK constraint';
+  ELSE
+    RAISE NOTICE 'projects.org_id FK already exists';
   END IF;
 END;
 $$;
@@ -85,22 +100,29 @@ $$;
 CREATE INDEX IF NOT EXISTS idx_projects_org_id ON public.projects(org_id);
 
 -- Ensure projects.status exists and is constrained; backfill NULLs to 'active'
-ALTER TABLE public.projects
-  ADD COLUMN IF NOT EXISTS status text;
-
--- Set default for new rows going forward
-ALTER TABLE public.projects
-  ALTER COLUMN status SET DEFAULT 'active';
-
--- Backfill existing NULL values
-UPDATE public.projects
-SET status = 'active'
-WHERE status IS NULL;
-
--- Add NOT NULL constraint after backfill
 DO $$
 BEGIN
-  -- Check if column is nullable
+  -- Add status column if it doesn't exist
+  IF NOT EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_schema = 'public'
+    AND table_name = 'projects'
+    AND column_name = 'status'
+  ) THEN
+    ALTER TABLE public.projects ADD COLUMN status text;
+    RAISE NOTICE 'Added projects.status column';
+  ELSE
+    RAISE NOTICE 'projects.status already exists';
+  END IF;
+
+  -- Set default for new rows going forward
+  ALTER TABLE public.projects ALTER COLUMN status SET DEFAULT 'active';
+
+  -- Backfill existing NULL values
+  UPDATE public.projects SET status = 'active' WHERE status IS NULL;
+
+  -- Add NOT NULL constraint after backfill
   IF EXISTS (
     SELECT 1
     FROM information_schema.columns
@@ -109,28 +131,27 @@ BEGIN
     AND column_name = 'status'
     AND is_nullable = 'YES'
   ) THEN
-    ALTER TABLE public.projects
-      ALTER COLUMN status SET NOT NULL;
+    ALTER TABLE public.projects ALTER COLUMN status SET NOT NULL;
+    RAISE NOTICE 'Set projects.status to NOT NULL';
   END IF;
-END;
-$$;
 
--- Add CHECK constraint
-DO $$
-BEGIN
+  -- Add CHECK constraint
   IF NOT EXISTS (
     SELECT 1
-    FROM   information_schema.check_constraints c
-    JOIN   information_schema.constraint_table_usage u
-      ON   u.constraint_name = c.constraint_name
-     AND   u.table_schema = c.constraint_schema
-    WHERE  c.constraint_schema = 'public'
-    AND    u.table_name = 'projects'
-    AND    c.constraint_name = 'projects_status_check'
+    FROM information_schema.check_constraints c
+    JOIN information_schema.constraint_table_usage u
+      ON u.constraint_name = c.constraint_name
+     AND u.table_schema = c.constraint_schema
+    WHERE c.constraint_schema = 'public'
+    AND u.table_name = 'projects'
+    AND c.constraint_name = 'projects_status_check'
   ) THEN
     ALTER TABLE public.projects
       ADD CONSTRAINT projects_status_check
       CHECK (status IN ('active','paused','completed','archived'));
+    RAISE NOTICE 'Added projects.status CHECK constraint';
+  ELSE
+    RAISE NOTICE 'projects.status CHECK constraint already exists';
   END IF;
 END;
 $$;
