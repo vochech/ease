@@ -42,10 +42,16 @@ export default async function OrgLayout({ children, params }: OrgLayoutProps) {
   let userId: string;
 
   if (bypassAuth && !user) {
-    // DEV MODE: Create mock membership as owner
-    membership = { role: "owner" as const };
+    // DEV MODE: Create mock membership as owner (skip DB check)
+    membership = { 
+      role: "owner" as const,
+      org_id: org.id,
+      user_id: "dev-user-id",
+      created_at: new Date().toISOString()
+    };
     userId = "dev-user-id";
   } else {
+    // PRODUCTION: Check actual membership
     membership = await getOrgMembership(org.id);
     userId = user!.id;
 
