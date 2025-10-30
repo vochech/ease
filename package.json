@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "cross-env NEXT_TURBOPACK=false next dev",
-    "dev:webpack": "cross-env NEXT_TURBOPACK=false next dev",
+    "dev": "next dev --webpack",
+    "dev:turbo": "next dev --turbo",
     "test": "vitest",
     "build": "next build",
     "start": "next start",
