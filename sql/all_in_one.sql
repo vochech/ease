@@ -27,10 +27,8 @@ CREATE TABLE IF NOT EXISTS public.org_members (
 -- projects (org-scoped)
 CREATE TABLE IF NOT EXISTS public.projects (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  org_id      uuid REFERENCES public.organizations(id) ON DELETE CASCADE,
   name        text NOT NULL,
   description text,
-  status      text NOT NULL DEFAULT 'active' CHECK (status IN ('active','paused','completed','archived')),
   created_at  timestamptz DEFAULT now(),
   updated_at  timestamptz DEFAULT now()
 );
@@ -61,6 +59,81 @@ CREATE INDEX IF NOT EXISTS idx_org_members_user_id  ON public.org_members(user_i
 CREATE INDEX IF NOT EXISTS idx_projects_org_id      ON public.projects(org_id);
 CREATE INDEX IF NOT EXISTS idx_tasks_project_id     ON public.tasks(project_id);
 CREATE INDEX IF NOT EXISTS idx_meetings_project_id  ON public.meetings(project_id);
+
+-- 2b) Upgrades for existing databases (when tables already exist without newer columns)
+-- Ensure projects.org_id exists, has FK and index
+ALTER TABLE public.projects
+  ADD COLUMN IF NOT EXISTS org_id uuid;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM   information_schema.table_constraints tc
+    WHERE  tc.table_schema = 'public'
+    AND    tc.table_name   = 'projects'
+    AND    tc.constraint_type = 'FOREIGN KEY'
+    AND    tc.constraint_name = 'projects_org_id_fkey'
+  ) THEN
+    ALTER TABLE public.projects
+      ADD CONSTRAINT projects_org_id_fkey
+      FOREIGN KEY (org_id) REFERENCES public.organizations(id) ON DELETE CASCADE;
+  END IF;
+END;
+$$;
+
+CREATE INDEX IF NOT EXISTS idx_projects_org_id ON public.projects(org_id);
+
+-- Ensure projects.status exists and is constrained; backfill NULLs to 'active'
+ALTER TABLE public.projects
+  ADD COLUMN IF NOT EXISTS status text;
+
+-- Set default for new rows going forward
+ALTER TABLE public.projects
+  ALTER COLUMN status SET DEFAULT 'active';
+
+-- Backfill existing NULL values
+UPDATE public.projects
+SET status = 'active'
+WHERE status IS NULL;
+
+-- Add NOT NULL constraint after backfill
+DO $$
+BEGIN
+  -- Check if column is nullable
+  IF EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_schema = 'public'
+    AND table_name = 'projects'
+    AND column_name = 'status'
+    AND is_nullable = 'YES'
+  ) THEN
+    ALTER TABLE public.projects
+      ALTER COLUMN status SET NOT NULL;
+  END IF;
+END;
+$$;
+
+-- Add CHECK constraint
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM   information_schema.check_constraints c
+    JOIN   information_schema.constraint_table_usage u
+      ON   u.constraint_name = c.constraint_name
+     AND   u.table_schema = c.constraint_schema
+    WHERE  c.constraint_schema = 'public'
+    AND    u.table_name = 'projects'
+    AND    c.constraint_name = 'projects_status_check'
+  ) THEN
+    ALTER TABLE public.projects
+      ADD CONSTRAINT projects_status_check
+      CHECK (status IN ('active','paused','completed','archived'));
+  END IF;
+END;
+$$;
 
 -- 3) Row Level Security
 ALTER TABLE public.organizations ENABLE ROW LEVEL SECURITY;
