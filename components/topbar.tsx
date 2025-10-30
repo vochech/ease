@@ -1,18 +1,28 @@
-"use client";
+import { supabaseServer } from "@/lib/supabaseServer";
 
-import React from "react";
+export default async function Topbar({ title = "Dashboard" }: { title?: string }) {
+  let userName: string | undefined;
+  try {
+    const supabase = await supabaseServer();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    userName = user?.email ?? undefined;
+  } catch {
+    // ignore if not configured
+  }
 
-export default function Topbar({ title = "Dashboard" }: { title?: string }) {
+  const initials = userName?.[0]?.toUpperCase() ?? "W"; // Welcome fallback
+
   return (
-    <header className="sticky top-0 z-10 bg-white shadow-sm">
-      <div className="flex items-center justify-between p-4">
-        <h1 className="text-lg font-semibold text-gray-900">{title}</h1>
+    <header className="sticky top-0 z-10 border-b bg-white/80 backdrop-blur">
+      <div className="flex items-center justify-between px-6 py-3">
+        <h1 className="text-xl font-semibold tracking-tight">{title}</h1>
         <div className="flex items-center gap-3">
-          <div className="hidden sm:flex flex-col text-right">
-            <span className="text-sm font-medium">Vojta</span>
-            <span className="text-xs text-gray-500">vojta@example.com</span>
+          {userName && <span className="hidden text-sm text-gray-600 sm:inline">{userName}</span>}
+          <div className="grid h-8 w-8 place-items-center rounded-full bg-gray-200 text-sm font-medium text-gray-700">
+            {initials}
           </div>
-          <div className="h-9 w-9 rounded-full bg-gray-200 flex items-center justify-center">V</div>
         </div>
       </div>
     </header>

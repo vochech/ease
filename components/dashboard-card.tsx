@@ -12,7 +12,7 @@ type DashboardCardProps = {
 
 export function DashboardCard({ title, description, value, action, children }: DashboardCardProps) {
   return (
-    <div className="rounded-xl bg-white p-4 shadow-sm hover:shadow-md transition-shadow duration-150">
+    <div className="rounded-xl border bg-white p-4 shadow-sm hover:shadow-md transition">
       <header className="flex items-start justify-between gap-3">
         <div>
           <h3 className="text-sm font-medium text-gray-700">{title}</h3>

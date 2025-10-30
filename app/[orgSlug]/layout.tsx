@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { supabaseServer } from "@/lib/supabaseServer";
 import { getOrgMembership } from "@/lib/roles";
 import { OrgProvider } from "@/components/providers/org-provider";
+import SidebarNav from "@/components/sidebar-nav";
 
 type OrgLayoutProps = {
   children: ReactNode;
@@ -98,7 +99,10 @@ export default async function OrgLayout({ children, params }: OrgLayoutProps) {
         userRole: membership.role,
       }}
     >
-      {children}
+      <div className="grid min-h-screen grid-cols-[16rem_1fr] bg-gray-50">
+        <SidebarNav />
+        <div className="overflow-y-auto">{children}</div>
+      </div>
     </OrgProvider>
   );
 }

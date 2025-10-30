@@ -3,6 +3,7 @@
 import { useOrg } from "@/components/providers/org-provider";
 import { useRoleHelpers } from "@/lib/useRoleHelpers";
 import { DashboardCard } from "@/components/dashboard-card";
+import Link from "next/link";
 
 type Project = {
   id: string;
@@ -18,7 +19,7 @@ type ProjectsListProps = {
 };
 
 export function ProjectsList({ projects }: ProjectsListProps) {
-  const { userRole } = useOrg();
+  const { userRole, orgSlug } = useOrg();
   const { canEdit, canManage } = useRoleHelpers(userRole);
 
   return (
@@ -38,9 +39,12 @@ export function ProjectsList({ projects }: ProjectsListProps) {
             description={project.description || undefined}
             action={
               canManage ? (
-                <button className="text-sm text-blue-600 hover:underline">
+                <Link
+                  href={`/${orgSlug}/projects/${project.id}`}
+                  className="text-sm text-blue-600 hover:underline"
+                >
                   Manage
-                </button>
+                </Link>
               ) : null
             }
           >
