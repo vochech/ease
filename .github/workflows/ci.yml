@@ -21,6 +21,7 @@ jobs:
       NEXT_TELEMETRY_DISABLED: 1
       HUSKY: 0
       NEXT_DISABLE_TURBOPACK: 1
+      CI: true
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -38,25 +39,41 @@ jobs:
           cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile 2>&1 | tee ci-install.log
+        run: |
+          set -o pipefail
+          pnpm install --frozen-lockfile 2>&1 | tee ci-install.log
+          exit ${PIPESTATUS[0]}
 
       - name: Print tool versions
         run: |
           node -v
           pnpm -v
           npx next --version
+          npx tsc -v
 
       - name: Typecheck
-        run: pnpm -s typecheck 2>&1 | tee ci-typecheck.log
+        run: |
+          set -o pipefail
+          pnpm -s typecheck 2>&1 | tee ci-typecheck.log
+          exit ${PIPESTATUS[0]}
 
       - name: Lint
-        run: pnpm -s lint 2>&1 | tee ci-lint.log
+        run: |
+          set -o pipefail
+          pnpm -s lint 2>&1 | tee ci-lint.log
+          exit ${PIPESTATUS[0]}
 
       - name: Build
-        run: pnpm -s build:webpack 2>&1 | tee ci-build.log
+        run: |
+          set -o pipefail
+          pnpm -s build:webpack 2>&1 | tee ci-build.log
+          exit ${PIPESTATUS[0]}
 
       - name: Test
-        run: pnpm -s test -- --run 2>&1 | tee ci-test.log
+        run: |
+          set -o pipefail
+          pnpm -s test -- --run 2>&1 | tee ci-test.log
+          exit ${PIPESTATUS[0]}
 
       - name: Upload CI logs
         if: always()
@@ -75,6 +92,7 @@ jobs:
       ANALYZE: "true"
       HUSKY: 0
       NEXT_DISABLE_TURBOPACK: 1
+      CI: true
     steps:
       - name: Checkout
         uses: actions/checkout@v4
