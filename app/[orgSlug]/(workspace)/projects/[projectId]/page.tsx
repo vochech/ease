@@ -3,11 +3,7 @@ import { revalidatePath } from "next/cache";
 import { supabaseServer } from "@/lib/supabaseServer";
 import { EditProjectForm } from "@/components/projects/edit-project-form";
 import { TasksList } from "@/components/tasks/tasks-list";
-import NextDynamic from "next/dynamic";
-const GanttChart = NextDynamic(() => import("@/components/timeline/gantt-chart").then(m => m.GanttChart), {
-  ssr: false,
-  loading: () => <div className="h-64 animate-pulse rounded-md bg-gray-100" />,
-});
+import { GanttChartWrapper as GanttChart } from "@/components/timeline/gantt-chart-wrapper";
 import { AutoScheduleButton } from "@/components/scheduling/auto-schedule-button";
 import { ProjectMembersManager } from "@/components/projects/project-members-manager";
 import { getOrgMembership } from "@/lib/roles";

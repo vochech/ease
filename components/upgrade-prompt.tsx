@@ -1,6 +1,6 @@
 "use client";
 
-import { PRICING_TIERS, SubscriptionTier } from "@/lib/visibility";
+import { PRICING_TIERS, SubscriptionTier } from "@/lib/visibility-types";
 
 interface UpgradePromptProps {
   currentTier: SubscriptionTier;
