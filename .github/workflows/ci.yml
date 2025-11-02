@@ -20,6 +20,7 @@ jobs:
     env:
       NEXT_TELEMETRY_DISABLED: 1
       HUSKY: 0
+      NEXT_DISABLE_TURBOPACK: 1
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -39,6 +40,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Print tool versions
+        run: |
+          node -v
+          pnpm -v
+          npx next --version
+
       - name: Typecheck
         run: pnpm -s typecheck
 
@@ -46,7 +53,7 @@ jobs:
         run: pnpm -s lint
 
       - name: Build
-        run: pnpm -s build
+        run: pnpm -s build:webpack
 
       - name: Test
         run: pnpm -s test -- --run
@@ -58,6 +65,7 @@ jobs:
       NEXT_TELEMETRY_DISABLED: 1
       ANALYZE: "true"
       HUSKY: 0
+      NEXT_DISABLE_TURBOPACK: 1
     steps:
       - name: Checkout
         uses: actions/checkout@v4
