@@ -19,6 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NEXT_TELEMETRY_DISABLED: 1
+      HUSKY: 0
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -56,6 +57,7 @@ jobs:
     env:
       NEXT_TELEMETRY_DISABLED: 1
       ANALYZE: "true"
+      HUSKY: 0
     steps:
       - name: Checkout
         uses: actions/checkout@v4
