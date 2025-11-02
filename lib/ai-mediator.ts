@@ -321,7 +321,7 @@ Examples:
 - "What assumptions are we making that we should challenge?"`;
 
   try {
-    const response = await openai.chat.completions.create({
+    const response = await getOpenAI().chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         { role: "system", content: systemPrompt },
