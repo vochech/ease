@@ -10,6 +10,10 @@ on:
 permissions:
   contents: read
 
+defaults:
+  run:
+    shell: bash
+
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -41,8 +45,8 @@ jobs:
       - name: Install dependencies
         run: |
           set -o pipefail
-          pnpm install --frozen-lockfile 2>&1 | tee ci-install.log
-          exit ${PIPESTATUS[0]}
+          pnpm install --frozen-lockfile --reporter=ndjson 2>&1 | tee ci-install.log
+          code=${PIPESTATUS[0]}; if [ $code -ne 0 ]; then echo "Install failed with code $code"; exit $code; fi
 
       - name: Print tool versions
         run: |
@@ -55,25 +59,25 @@ jobs:
         run: |
           set -o pipefail
           pnpm -s typecheck 2>&1 | tee ci-typecheck.log
-          exit ${PIPESTATUS[0]}
+          code=${PIPESTATUS[0]}; if [ $code -ne 0 ]; then echo "Typecheck failed with code $code"; exit $code; fi
 
       - name: Lint
         run: |
           set -o pipefail
           pnpm -s lint 2>&1 | tee ci-lint.log
-          exit ${PIPESTATUS[0]}
+          code=${PIPESTATUS[0]}; if [ $code -ne 0 ]; then echo "Lint failed with code $code"; exit $code; fi
 
       - name: Build
         run: |
           set -o pipefail
           pnpm -s build:webpack 2>&1 | tee ci-build.log
-          exit ${PIPESTATUS[0]}
+          code=${PIPESTATUS[0]}; if [ $code -ne 0 ]; then echo "Build failed with code $code"; exit $code; fi
 
       - name: Test
         run: |
           set -o pipefail
           pnpm -s test -- --run 2>&1 | tee ci-test.log
-          exit ${PIPESTATUS[0]}
+          code=${PIPESTATUS[0]}; if [ $code -ne 0 ]; then echo "Tests failed with code $code"; exit $code; fi
 
       - name: Upload CI logs
         if: always()
