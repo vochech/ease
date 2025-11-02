@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
-import { getGoogleAuthClient, exchangeCodeForToken } from "../../../../../lib/googleCalendar";
+import {
+  getGoogleAuthClient,
+  exchangeCodeForToken,
+} from "../../../../../lib/googleCalendar";
 
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const code = searchParams.get("code");
-    if (!code) return NextResponse.json({ error: "Missing code" }, { status: 400 });
+    if (!code)
+      return NextResponse.json({ error: "Missing code" }, { status: 400 });
 
     const auth = getGoogleAuthClient();
     const tokens = await exchangeCodeForToken(auth, code);
@@ -22,6 +26,9 @@ export async function GET(req: Request) {
 
     return res;
   } catch (error: any) {
-    return NextResponse.json({ error: error?.message || String(error) }, { status: 500 });
+    return NextResponse.json(
+      { error: error?.message || String(error) },
+      { status: 500 },
+    );
   }
 }

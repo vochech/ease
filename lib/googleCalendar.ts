@@ -9,7 +9,9 @@ export function getGoogleAuthClient(): any {
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
   const redirectUri = process.env.GOOGLE_REDIRECT_URI;
   if (!clientId || !clientSecret || !redirectUri) {
-    throw new Error("Missing Google OAuth env vars. Set GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI in .env.local");
+    throw new Error(
+      "Missing Google OAuth env vars. Set GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI in .env.local",
+    );
   }
   // Use the auth client exposed on the googleapis package to avoid importing
   // a separate runtime that may be ESM/compatibility-sensitive in some
@@ -31,7 +33,7 @@ export function getCalendarClient(auth: any) {
  */
 export async function listEvents(
   auth: any,
-  maxResults = 10
+  maxResults = 10,
 ): Promise<calendar_v3.Schema$Event[]> {
   const calendar = getCalendarClient(auth);
   try {
@@ -45,9 +47,10 @@ export async function listEvents(
     return response.data.items || [];
   } catch (error) {
     // Google API errors are often objects with 'errors' or 'message'
-    const message = (error && typeof error === 'object' && 'message' in error)
-      ? (error as any).message
-      : String(error);
+    const message =
+      error && typeof error === "object" && "message" in error
+        ? (error as any).message
+        : String(error);
     console.error("Google Calendar API error:", message);
     throw new Error("Failed to fetch calendar events: " + message);
   }
@@ -56,9 +59,9 @@ export async function listEvents(
 /**
  * Helper: generate an OAuth consent URL for the requested scopes.
  */
-export function generateAuthUrl(scopes: string[] = [
-  "https://www.googleapis.com/auth/calendar.readonly",
-]) {
+export function generateAuthUrl(
+  scopes: string[] = ["https://www.googleapis.com/auth/calendar.readonly"],
+) {
   const client = getGoogleAuthClient();
   return client.generateAuthUrl({
     access_type: "offline",

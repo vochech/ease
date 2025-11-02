@@ -1,3 +1,4 @@
+import "server-only";
 import { cookies } from "next/headers";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 
@@ -17,9 +18,8 @@ export async function supabaseServer() {
   const keyToUse = bypassAuth && serviceRoleKey ? serviceRoleKey : anonKey;
 
   if (bypassAuth && !serviceRoleKey) {
-    // eslint-disable-next-line no-console
     console.warn(
-      "BYPASS_AUTH is enabled but SUPABASE_SERVICE_ROLE_KEY is missing. Falling back to anon key; RLS may block queries."
+      "BYPASS_AUTH is enabled but SUPABASE_SERVICE_ROLE_KEY is missing. Falling back to anon key; RLS may block queries.",
     );
   }
 
@@ -29,10 +29,20 @@ export async function supabaseServer() {
         return cookieStore.get(name)?.value;
       },
       set(name: string, value: string, options: CookieOptions) {
-        cookieStore.set({ name, value, ...options });
+        try {
+          cookieStore.set({ name, value, ...options });
+        } catch {
+          // In Server Components, cookies can only be read, not modified
+          // This is expected and can be safely ignored
+        }
       },
       remove(name: string, options: CookieOptions) {
-        cookieStore.set({ name, value: "", ...options });
+        try {
+          cookieStore.set({ name, value: "", ...options });
+        } catch {
+          // In Server Components, cookies can only be read, not modified
+          // This is expected and can be safely ignored
+        }
       },
     },
   });

@@ -1,0 +1,24 @@
+version: "3.9"
+
+services:
+  livekit:
+    image: livekit/livekit-server:latest
+    container_name: livekit
+    restart: unless-stopped
+    environment:
+      # Use the same keys as your app's env for convenience
+      # docker compose reads .env in project root automatically; we also pass defaults below
+      # NOTE: LiveKit expects a space after the colon ("key: secret")
+      LIVEKIT_KEYS: "${LIVEKIT_API_KEY:-devkey}: ${LIVEKIT_API_SECRET:-secret}"
+      LIVEKIT_LOG_LEVEL: info
+    command: ["--dev", "--bind", "0.0.0.0"]
+    ports:
+      - "7880:7880" # HTTP & WebSocket (Signal)
+      - "7881:7881" # TCP relay (optional)
+      - "7882:7882/udp" # RTP/RTCP (optional for external clients)
+    networks:
+      - livekit-net
+
+networks:
+  livekit-net:
+    driver: bridge

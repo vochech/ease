@@ -1,3 +1,4 @@
+/* stylelint-disable at-rule-no-unknown */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,7 +9,9 @@
 
 @layer base {
   /* sensible defaults / reset */
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     box-sizing: border-box;
   }
 
@@ -20,8 +23,15 @@
     min-height: 100dvh;
     height: 100%;
     margin: 0;
-    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
-      "Helvetica Neue", Arial;
+    font-family:
+      Inter,
+      ui-sans-serif,
+      system-ui,
+      -apple-system,
+      "Segoe UI",
+      Roboto,
+      "Helvetica Neue",
+      Arial;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-color: #ffffff;
@@ -37,5 +47,79 @@
     max-width: 100%;
     height: auto;
     display: block;
+  }
+}
+
+/* LiveKit Meeting Room Customization */
+@layer components {
+  /* Participant tiles with rounded corners */
+  .lk-participant-tile {
+    @apply rounded-xl overflow-hidden border border-gray-800;
+  }
+
+  /* Smaller participant metadata */
+  .lk-participant-metadata {
+    @apply text-xs px-3 py-2;
+  }
+
+  .lk-participant-name {
+    @apply text-xs font-medium truncate;
+  }
+
+  /* Compact control bar buttons - horizontal layout */
+  .lk-control-bar {
+    @apply inline-flex flex-row gap-0.5 bg-transparent p-0 m-0 shadow-none border-0 w-fit h-auto;
+  }
+
+  /* Ensure inner groups don't add margins that stretch container */
+  .lk-control-bar > * {
+    @apply m-0 gap-0.5;
+  }
+
+  .lk-button {
+    @apply h-7 w-7 min-w-7 min-h-7 rounded transition-all hover:bg-gray-800 p-0 m-0 text-white;
+  }
+
+  /* Icon inside button - white color */
+  .lk-button svg {
+    @apply h-4 w-4 text-white;
+  }
+
+  /* White color for icons */
+  .lk-button svg path {
+    @apply stroke-white;
+  }
+
+  /* Hide button labels for minimal design */
+  .lk-button span:not(.lk-button-icon) {
+    @apply hidden;
+  }
+
+  /* Active state for buttons */
+  .lk-button[data-lk-enabled="true"] {
+    @apply bg-gray-700;
+  }
+
+  .lk-button[data-lk-enabled="false"] {
+    @apply bg-red-600 hover:bg-red-700;
+  }
+
+  /* Much smaller participant placeholder/avatar */
+  .lk-participant-placeholder {
+    @apply text-3xl;
+  }
+
+  /* Hide connection quality indicator for cleaner look */
+  .lk-connection-quality {
+    @apply hidden;
+  }
+
+  /* Participant tile background */
+  .lk-participant-tile[data-lk-local-participant="false"] {
+    @apply bg-gray-900;
+  }
+
+  .lk-participant-tile[data-lk-local-participant="true"] {
+    @apply bg-gray-900 border-blue-600;
   }
 }

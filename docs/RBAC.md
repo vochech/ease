@@ -6,13 +6,13 @@ This project implements organization-scoped role-based access control.
 
 Roles are hierarchical with numerical ranks:
 
-| Role     | Rank | Permissions                                    |
-|----------|------|------------------------------------------------|
-| `owner`  | 4    | Full control (delete org, manage all members) |
-| `manager`| 3    | Manage projects, tasks, members                |
-| `member` | 2    | Create and edit projects, tasks                |
-| `viewer` | 1    | Read-only access                               |
-| `invited`| 0    | No access (pending invitation)                 |
+| Role      | Rank | Permissions                                   |
+| --------- | ---- | --------------------------------------------- |
+| `owner`   | 4    | Full control (delete org, manage all members) |
+| `manager` | 3    | Manage projects, tasks, members               |
+| `member`  | 2    | Create and edit projects, tasks               |
+| `viewer`  | 1    | Read-only access                              |
+| `invited` | 0    | No access (pending invitation)                |
 
 ## Server-Side Usage
 
@@ -22,10 +22,13 @@ Roles are hierarchical with numerical ranks:
 // app/api/projects/[id]/route.ts
 import { requireRole } from "@/lib/roles";
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(
+  req: Request,
+  { params }: { params: { id: string } },
+) {
   // Only owners and managers can update projects
   await requireRole(orgId, ["owner", "manager"]);
-  
+
   // Your update logic here...
 }
 ```
@@ -33,7 +36,13 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
 ### Helper Functions
 
 ```typescript
-import { getUser, getSession, getOrgMembership, requireRole, hasMinimumRole } from "@/lib/roles";
+import {
+  getUser,
+  getSession,
+  getOrgMembership,
+  requireRole,
+  hasMinimumRole,
+} from "@/lib/roles";
 
 // Get current user
 const user = await getUser();
@@ -61,7 +70,7 @@ import { useCan } from "@/lib/useRoleHelpers";
 
 function MyComponent({ userRole }: { userRole: OrgRole }) {
   const canEdit = useCan("member", userRole);
-  
+
   return (
     <div>
       {canEdit && <button>Edit</button>}
@@ -78,7 +87,7 @@ import { useRoleHelpers } from "@/lib/useRoleHelpers";
 
 function ProjectCard({ userRole }: { userRole: OrgRole }) {
   const { canEdit, canManage, isOwner } = useRoleHelpers(userRole);
-  
+
   return (
     <div>
       {canEdit && <button>Edit Project</button>}
@@ -98,19 +107,23 @@ See `components/project-actions.tsx` for a complete example of role-based UI ren
 ### Tables
 
 **`organizations`**
+
 - Organization entities with unique slugs
 
 **`org_members`**
+
 - Links users to organizations with roles
 - Unique constraint on `(org_id, user_id)`
 
 **`projects`**
+
 - Belongs to an organization via `org_id`
 - Inherits permissions from org membership
 
 ### Migration
 
 Apply the SQL migration at `sql/migrations/001_create_tables.sql` to create:
+
 - `organizations` table
 - `org_members` table (with role check constraint)
 - `projects`, `tasks`, `meetings` tables (with org relationships)
@@ -144,6 +157,7 @@ await requireRole(orgId, ["owner", "manager"]);
 ## Error Responses
 
 ### 401 Unauthorized
+
 User is not authenticated.
 
 ```json
@@ -153,6 +167,7 @@ User is not authenticated.
 ```
 
 ### 403 Forbidden (Not a member)
+
 User is not a member of the organization.
 
 ```json
@@ -162,6 +177,7 @@ User is not a member of the organization.
 ```
 
 ### 403 Forbidden (Insufficient permissions)
+
 User lacks the required role.
 
 ```json
@@ -194,7 +210,7 @@ describe("Role permissions", () => {
   it("should allow manager to access member resources", () => {
     expect(hasRoleRank("manager", "member")).toBe(true);
   });
-  
+
   it("should not allow viewer to access manager resources", () => {
     expect(hasRoleRank("viewer", "manager")).toBe(false);
   });

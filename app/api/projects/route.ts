@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireRole, getUser } from "../../../lib/roles";
 import { supabaseServer } from "../../../lib/supabaseServer";
+import { z } from "zod";
 
 /**
  * GET /api/projects
@@ -10,11 +11,11 @@ import { supabaseServer } from "../../../lib/supabaseServer";
 export async function GET(req: Request) {
   try {
     const user = await getUser();
-    
+
     if (!user) {
       return NextResponse.json(
         { error: "Unauthorized. Please log in." },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -29,7 +30,7 @@ export async function GET(req: Request) {
     if (error) {
       return NextResponse.json(
         { error: "Failed to fetch projects", details: error.message },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -42,10 +43,19 @@ export async function GET(req: Request) {
     console.error("GET /api/projects error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
+
+const createProjectSchema = z.object({
+  org_id: z.string().uuid(),
+  name: z.string().min(1).max(255),
+  description: z.string().nullable().optional(),
+  status: z
+    .enum(["active", "paused", "completed", "archived"])
+    .default("active"),
+});
 
 /**
  * POST /api/projects
@@ -55,17 +65,12 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { name, description, org_id } = body;
 
-    if (!name || !org_id) {
-      return NextResponse.json(
-        { error: "Missing required fields: name, org_id" },
-        { status: 400 }
-      );
-    }
+    // Validate input
+    const validatedData = createProjectSchema.parse(body);
 
     // Check permissions - owner, manager, and member can create projects
-    await requireRole(org_id, ["owner", "manager", "member"]);
+    await requireRole(validatedData.org_id, ["owner", "manager", "member"]);
 
     const supabase = await supabaseServer();
 
@@ -73,9 +78,10 @@ export async function POST(req: Request) {
     const { data, error } = await supabase
       .from("projects")
       .insert({
-        name,
-        description: description || null,
-        org_id,
+        name: validatedData.name,
+        description: validatedData.description,
+        org_id: validatedData.org_id,
+        status: validatedData.status,
       })
       .select()
       .single();
@@ -83,12 +89,19 @@ export async function POST(req: Request) {
     if (error) {
       return NextResponse.json(
         { error: "Failed to create project", details: error.message },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
     return NextResponse.json({ project: data }, { status: 201 });
   } catch (error: any) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: "Invalid request data", details: error.issues },
+        { status: 400 },
+      );
+    }
+
     if (error instanceof NextResponse) {
       return error;
     }
@@ -96,7 +109,7 @@ export async function POST(req: Request) {
     console.error("POST /api/projects error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

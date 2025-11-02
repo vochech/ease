@@ -1,0 +1,17 @@
+{
+  "models": [
+    {
+      "title": "GPT-5 Reviewer",
+      "provider": "openai",
+      "model": "gpt-5"
+    }
+  ],
+  "defaultModel": "GPT-5 Reviewer",
+  "commands": [
+    {
+      "title": "Review Current File for Best Practices",
+      "prompt": "Analyze this file using Ease App coding guidelines and point out all best-practice violations, readability issues, and maintainability concerns.",
+      "context": "file"
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import "../styles/globals.css";
+import "@/styles/globals.css";
 import { Inter } from "next/font/google";
 
 export const metadata: Metadata = {
@@ -13,7 +13,11 @@ const inter = Inter({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 });
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="cs">
       <body className={`${inter.className} min-h-dvh bg-white text-gray-900 antialiased`}>

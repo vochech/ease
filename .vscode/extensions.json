@@ -1,0 +1,20 @@
+{
+  "recommendations": [
+    // Code quality & formatting
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "bradlc.vscode-tailwindcss",
+
+    // Supabase & Database
+    "supabase.vscode-supabase-extension",
+    "mtxr.sqltools",
+    "mtxr.sqltools-driver-pg",
+    "ckolkman.vscode-postgres",
+
+    // SQL formatting & tooling
+    "inferrinizzard.prettier-sql-vscode",
+
+    // AI & productivity (optional but recommended)
+    "visualstudioexptteam.vscodeintellicode"
+  ]
+}

@@ -6,20 +6,20 @@ import type { OrgRole } from "../types/roles";
 type ProjectActionsProps = {
   projectId: string;
   userRole: OrgRole | null;
-  onEdit?: () => void;
-  onDelete?: () => void;
+  onEditAction?: () => void;
+  onDeleteAction?: () => void;
 };
 
 /**
  * Example component showing how to use role-based permissions in the UI.
- * 
+ *
  * This component conditionally renders action buttons based on the user's role.
  */
 export default function ProjectActions({
   projectId,
   userRole,
-  onEdit,
-  onDelete,
+  onEditAction,
+  onDeleteAction,
 }: ProjectActionsProps) {
   const { canEdit, canManage, isOwner } = useRoleHelpers(userRole);
 
@@ -28,26 +28,26 @@ export default function ProjectActions({
       {/* View button - all authenticated users can view */}
       <button
         className="px-3 py-1 text-sm border rounded hover:bg-gray-50"
-        onClick={() => window.location.href = `/projects/${projectId}`}
+        onClick={() => (window.location.href = `/projects/${projectId}`)}
       >
         View
       </button>
 
       {/* Edit button - members and above can edit */}
-      {canEdit && onEdit && (
+      {canEdit && onEditAction && (
         <button
           className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
-          onClick={onEdit}
+          onClick={onEditAction}
         >
           Edit
         </button>
       )}
 
       {/* Delete button - only managers and owners can delete */}
-      {canManage && onDelete && (
+      {canManage && onDeleteAction && (
         <button
           className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700"
-          onClick={onDelete}
+          onClick={onDeleteAction}
         >
           Delete
         </button>

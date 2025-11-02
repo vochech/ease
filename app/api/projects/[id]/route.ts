@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireRole } from "../../../../lib/roles";
 import { supabaseServer } from "../../../../lib/supabaseServer";
+import { z } from "zod";
 
 /**
  * GET /api/projects/[id]
@@ -9,7 +10,7 @@ import { supabaseServer } from "../../../../lib/supabaseServer";
  */
 export async function GET(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
@@ -22,10 +23,7 @@ export async function GET(
       .single();
 
     if (error || !data) {
-      return NextResponse.json(
-        { error: "Project not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
     // Note: In production, you'd check org membership for the project's org_id
@@ -38,14 +36,20 @@ export async function GET(
     if (error instanceof NextResponse) {
       return error;
     }
-    
+
     console.error("GET /api/projects/[id] error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
+
+const updateProjectSchema = z.object({
+  name: z.string().min(1).max(255).optional(),
+  description: z.string().nullable().optional(),
+  status: z.enum(["active", "paused", "completed", "archived"]).optional(),
+});
 
 /**
  * PATCH /api/projects/[id]
@@ -54,12 +58,15 @@ export async function GET(
  */
 export async function PATCH(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
     const body = await req.json();
     const supabase = await supabaseServer();
+
+    // Validate input
+    const validatedData = updateProjectSchema.parse(body);
 
     // First, get the project to find its org_id
     const { data: project, error: fetchError } = await supabase
@@ -69,23 +76,27 @@ export async function PATCH(
       .single();
 
     if (fetchError || !project) {
-      return NextResponse.json(
-        { error: "Project not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
     // Check permissions - only owner and manager can update
     await requireRole(project.org_id, ["owner", "manager"]);
 
+    // Build update object with only provided fields
+    const updateData: Record<string, any> = {
+      updated_at: new Date().toISOString(),
+    };
+
+    if (validatedData.name !== undefined) updateData.name = validatedData.name;
+    if (validatedData.description !== undefined)
+      updateData.description = validatedData.description;
+    if (validatedData.status !== undefined)
+      updateData.status = validatedData.status;
+
     // Update the project
     const { data, error } = await supabase
       .from("projects")
-      .update({
-        name: body.name,
-        description: body.description,
-        updated_at: new Date().toISOString(),
-      })
+      .update(updateData)
       .eq("id", id)
       .select()
       .single();
@@ -93,12 +104,19 @@ export async function PATCH(
     if (error) {
       return NextResponse.json(
         { error: "Failed to update project", details: error.message },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
     return NextResponse.json({ project: data });
   } catch (error: any) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: "Invalid request data", details: error.issues },
+        { status: 400 },
+      );
+    }
+
     if (error instanceof NextResponse) {
       return error;
     }
@@ -106,7 +124,7 @@ export async function PATCH(
     console.error("PATCH /api/projects/[id] error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -118,7 +136,7 @@ export async function PATCH(
  */
 export async function DELETE(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
@@ -132,25 +150,19 @@ export async function DELETE(
       .single();
 
     if (fetchError || !project) {
-      return NextResponse.json(
-        { error: "Project not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
     // Check permissions - only owner and manager can delete
     await requireRole(project.org_id, ["owner", "manager"]);
 
     // Delete the project
-    const { error } = await supabase
-      .from("projects")
-      .delete()
-      .eq("id", id);
+    const { error } = await supabase.from("projects").delete().eq("id", id);
 
     if (error) {
       return NextResponse.json(
         { error: "Failed to delete project", details: error.message },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -163,7 +175,7 @@ export async function DELETE(
     console.error("DELETE /api/projects/[id] error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

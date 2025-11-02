@@ -6,6 +6,9 @@ export async function GET() {
     const url = generateAuthUrl();
     return NextResponse.json({ url });
   } catch (error: any) {
-    return NextResponse.json({ error: error?.message || String(error) }, { status: 500 });
+    return NextResponse.json(
+      { error: error?.message || String(error) },
+      { status: 500 },
+    );
   }
 }

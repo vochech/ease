@@ -2,7 +2,7 @@
  * Organization roles with hierarchical permissions.
  * Higher rank = more permissions.
  */
-export type OrgRole = 'owner' | 'manager' | 'member' | 'viewer' | 'invited';
+export type OrgRole = "owner" | "manager" | "member" | "viewer" | "invited";
 
 /**
  * Numerical rank for each role.

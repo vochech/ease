@@ -10,11 +10,11 @@ export async function POST(req: Request) {
     // Optional: check for a secret header to prevent unauthorized seeding
     const authHeader = req.headers.get("x-seed-secret");
     const expectedSecret = process.env.SEED_SECRET || "dev-seed-secret";
-    
+
     if (authHeader !== expectedSecret) {
       return NextResponse.json(
         { error: "Unauthorized. Provide correct x-seed-secret header." },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -24,16 +24,31 @@ export async function POST(req: Request) {
     const { data: projects, error: projectsError } = await supabase
       .from("projects")
       .insert([
-        { name: "Website Redesign", description: "Modernize company website with new branding" },
-        { name: "Mobile App Launch", description: "Launch iOS and Android apps for Q4" },
-        { name: "API v2 Migration", description: "Migrate all services to new REST API" },
-        { name: "Customer Dashboard", description: "Build self-service portal for customers" },
+        {
+          name: "Website Redesign",
+          description: "Modernize company website with new branding",
+        },
+        {
+          name: "Mobile App Launch",
+          description: "Launch iOS and Android apps for Q4",
+        },
+        {
+          name: "API v2 Migration",
+          description: "Migrate all services to new REST API",
+        },
+        {
+          name: "Customer Dashboard",
+          description: "Build self-service portal for customers",
+        },
       ])
       .select();
 
     if (projectsError) {
       console.error("Projects seed error:", projectsError);
-      return NextResponse.json({ error: "Failed to seed projects", details: projectsError.message }, { status: 500 });
+      return NextResponse.json(
+        { error: "Failed to seed projects", details: projectsError.message },
+        { status: 500 },
+      );
     }
 
     // Insert sample tasks (linked to projects)
@@ -41,22 +56,65 @@ export async function POST(req: Request) {
     const { data: tasks, error: tasksError } = await supabase
       .from("tasks")
       .insert([
-        { project_id: projectIds[0], title: "Design homepage mockups", completed: true },
-        { project_id: projectIds[0], title: "Update color palette", completed: false },
-        { project_id: projectIds[0], title: "Review wireframes with team", completed: false },
-        { project_id: projectIds[1], title: "Setup app store accounts", completed: true },
-        { project_id: projectIds[1], title: "Prepare marketing materials", completed: false },
-        { project_id: projectIds[1], title: "Submit for app review", completed: false },
-        { project_id: projectIds[2], title: "Write migration guide", completed: false },
-        { project_id: projectIds[2], title: "Test backward compatibility", completed: false },
-        { project_id: projectIds[3], title: "Design user flows", completed: true },
-        { project_id: projectIds[3], title: "Implement authentication", completed: false },
+        {
+          project_id: projectIds[0],
+          title: "Design homepage mockups",
+          completed: true,
+        },
+        {
+          project_id: projectIds[0],
+          title: "Update color palette",
+          completed: false,
+        },
+        {
+          project_id: projectIds[0],
+          title: "Review wireframes with team",
+          completed: false,
+        },
+        {
+          project_id: projectIds[1],
+          title: "Setup app store accounts",
+          completed: true,
+        },
+        {
+          project_id: projectIds[1],
+          title: "Prepare marketing materials",
+          completed: false,
+        },
+        {
+          project_id: projectIds[1],
+          title: "Submit for app review",
+          completed: false,
+        },
+        {
+          project_id: projectIds[2],
+          title: "Write migration guide",
+          completed: false,
+        },
+        {
+          project_id: projectIds[2],
+          title: "Test backward compatibility",
+          completed: false,
+        },
+        {
+          project_id: projectIds[3],
+          title: "Design user flows",
+          completed: true,
+        },
+        {
+          project_id: projectIds[3],
+          title: "Implement authentication",
+          completed: false,
+        },
       ])
       .select();
 
     if (tasksError) {
       console.error("Tasks seed error:", tasksError);
-      return NextResponse.json({ error: "Failed to seed tasks", details: tasksError.message }, { status: 500 });
+      return NextResponse.json(
+        { error: "Failed to seed tasks", details: tasksError.message },
+        { status: 500 },
+      );
     }
 
     // Insert sample meetings
@@ -77,7 +135,9 @@ export async function POST(req: Request) {
         {
           project_id: projectIds[1],
           title: "Sprint Planning",
-          starts_at: new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+          starts_at: new Date(
+            now.getTime() + 2 * 24 * 60 * 60 * 1000,
+          ).toISOString(),
         },
         {
           project_id: projectIds[2],
@@ -89,7 +149,10 @@ export async function POST(req: Request) {
 
     if (meetingsError) {
       console.error("Meetings seed error:", meetingsError);
-      return NextResponse.json({ error: "Failed to seed meetings", details: meetingsError.message }, { status: 500 });
+      return NextResponse.json(
+        { error: "Failed to seed meetings", details: meetingsError.message },
+        { status: 500 },
+      );
     }
 
     return NextResponse.json({
@@ -104,8 +167,11 @@ export async function POST(req: Request) {
   } catch (error: any) {
     console.error("Seed route error:", error);
     return NextResponse.json(
-      { error: "Internal server error", details: error?.message || String(error) },
-      { status: 500 }
+      {
+        error: "Internal server error",
+        details: error?.message || String(error),
+      },
+      { status: 500 },
     );
   }
 }

@@ -54,7 +54,7 @@ export async function getSession() {
  * Returns null if the user is not a member.
  */
 export async function getOrgMembership(
-  orgId: string
+  orgId: string,
 ): Promise<OrgMembership | null> {
   try {
     const user = await getUser();
@@ -84,11 +84,11 @@ export async function getOrgMembership(
 /**
  * Require that the current user has one of the allowed roles for the organization.
  * Throws a 401 if not authenticated, 403 if not a member or insufficient permissions.
- * 
+ *
  * @param orgId - The organization ID to check membership for
  * @param allowedRoles - Array of roles that are allowed to access this resource
  * @returns The user's membership if authorized
- * 
+ *
  * @example
  * ```ts
  * // In an API route:
@@ -98,14 +98,14 @@ export async function getOrgMembership(
  */
 export async function requireRole(
   orgId: string,
-  allowedRoles: OrgRole[]
+  allowedRoles: OrgRole[],
 ): Promise<OrgMembership> {
   const user = await getUser();
-  
+
   if (!user) {
     throw NextResponse.json(
       { error: "Unauthorized. Please log in." },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -114,7 +114,7 @@ export async function requireRole(
   if (!membership) {
     throw NextResponse.json(
       { error: "Forbidden. You are not a member of this organization." },
-      { status: 403 }
+      { status: 403 },
     );
   }
 
@@ -127,7 +127,7 @@ export async function requireRole(
         requiredRoles: allowedRoles,
         yourRole: membership.role,
       },
-      { status: 403 }
+      { status: 403 },
     );
   }
 
@@ -140,10 +140,10 @@ export async function requireRole(
  */
 export async function hasMinimumRole(
   orgId: string,
-  minimumRole: OrgRole
+  minimumRole: OrgRole,
 ): Promise<boolean> {
   const membership = await getOrgMembership(orgId);
-  
+
   if (!membership) {
     return false;
   }

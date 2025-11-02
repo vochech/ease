@@ -17,10 +17,15 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 async function runMigration() {
   console.log("📦 Applying database migration...");
-  
-  const sqlPath = path.join(process.cwd(), "sql", "migrations", "001_create_tables.sql");
+
+  const sqlPath = path.join(
+    process.cwd(),
+    "sql",
+    "migrations",
+    "001_create_tables.sql",
+  );
   const sql = fs.readFileSync(sqlPath, "utf8");
-  
+
   // Split by semicolons and execute each statement
   const statements = sql
     .split(";")
@@ -29,9 +34,11 @@ async function runMigration() {
 
   for (const statement of statements) {
     if (!statement) continue;
-    
+
     try {
-      const { error } = await supabase.rpc("exec_sql", { sql_query: statement });
+      const { error } = await supabase.rpc("exec_sql", {
+        sql_query: statement,
+      });
       if (error) {
         console.warn("⚠️  Statement warning:", error.message);
       }
@@ -40,7 +47,7 @@ async function runMigration() {
       console.log("   Executing:", statement.substring(0, 50) + "...");
     }
   }
-  
+
   console.log("✅ Migration applied");
 }
 
@@ -61,10 +68,22 @@ async function seedData() {
   const { data: projects, error: projectsError } = await supabase
     .from("projects")
     .insert([
-      { name: "Website Redesign", description: "Modernize company website with new branding" },
-      { name: "Mobile App Launch", description: "Launch iOS and Android apps for Q4" },
-      { name: "API v2 Migration", description: "Migrate all services to new REST API" },
-      { name: "Customer Dashboard", description: "Build self-service portal for customers" },
+      {
+        name: "Website Redesign",
+        description: "Modernize company website with new branding",
+      },
+      {
+        name: "Mobile App Launch",
+        description: "Launch iOS and Android apps for Q4",
+      },
+      {
+        name: "API v2 Migration",
+        description: "Migrate all services to new REST API",
+      },
+      {
+        name: "Customer Dashboard",
+        description: "Build self-service portal for customers",
+      },
     ])
     .select();
 
@@ -80,16 +99,56 @@ async function seedData() {
   const { data: tasks, error: tasksError } = await supabase
     .from("tasks")
     .insert([
-      { project_id: projectIds[0], title: "Design homepage mockups", completed: true },
-      { project_id: projectIds[0], title: "Update color palette", completed: false },
-      { project_id: projectIds[0], title: "Review wireframes with team", completed: false },
-      { project_id: projectIds[1], title: "Setup app store accounts", completed: true },
-      { project_id: projectIds[1], title: "Prepare marketing materials", completed: false },
-      { project_id: projectIds[1], title: "Submit for app review", completed: false },
-      { project_id: projectIds[2], title: "Write migration guide", completed: false },
-      { project_id: projectIds[2], title: "Test backward compatibility", completed: false },
-      { project_id: projectIds[3], title: "Design user flows", completed: true },
-      { project_id: projectIds[3], title: "Implement authentication", completed: false },
+      {
+        project_id: projectIds[0],
+        title: "Design homepage mockups",
+        completed: true,
+      },
+      {
+        project_id: projectIds[0],
+        title: "Update color palette",
+        completed: false,
+      },
+      {
+        project_id: projectIds[0],
+        title: "Review wireframes with team",
+        completed: false,
+      },
+      {
+        project_id: projectIds[1],
+        title: "Setup app store accounts",
+        completed: true,
+      },
+      {
+        project_id: projectIds[1],
+        title: "Prepare marketing materials",
+        completed: false,
+      },
+      {
+        project_id: projectIds[1],
+        title: "Submit for app review",
+        completed: false,
+      },
+      {
+        project_id: projectIds[2],
+        title: "Write migration guide",
+        completed: false,
+      },
+      {
+        project_id: projectIds[2],
+        title: "Test backward compatibility",
+        completed: false,
+      },
+      {
+        project_id: projectIds[3],
+        title: "Design user flows",
+        completed: true,
+      },
+      {
+        project_id: projectIds[3],
+        title: "Implement authentication",
+        completed: false,
+      },
     ])
     .select();
 
@@ -118,7 +177,9 @@ async function seedData() {
       {
         project_id: projectIds[1],
         title: "Sprint Planning",
-        starts_at: new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+        starts_at: new Date(
+          now.getTime() + 2 * 24 * 60 * 60 * 1000,
+        ).toISOString(),
       },
       {
         project_id: projectIds[2],
@@ -141,7 +202,9 @@ async function main() {
   try {
     await runMigration();
     await seedData();
-    console.log("\n🎉 Setup complete! Refresh your dashboard to see live data.");
+    console.log(
+      "\n🎉 Setup complete! Refresh your dashboard to see live data.",
+    );
   } catch (error) {
     console.error("\n❌ Setup failed:", error);
     process.exit(1);

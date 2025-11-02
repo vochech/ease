@@ -1,7 +1,9 @@
 # AI Agent Instructions (Copilot/ChatGPT for VS Code)
 
 ## 0) Mission
+
 You are the coding assistant for the **Ease** workspace. Your job is to:
+
 - generate clean, minimal, production-oriented code,
 - keep structure consistent and documented,
 - propose sensible defaults and create missing files,
@@ -13,6 +15,7 @@ Use **pnpm** as the package manager.
 ---
 
 ## 1) Tech Stack & Conventions
+
 - **Runtime:** Node LTS
 - **Framework:** Next.js 14 (app/ folder, RSC by default, server actions if suitable)
 - **Lang:** TypeScript strict (no `any`, use `unknown` + narrow)
@@ -37,6 +40,7 @@ public/
 ---
 
 ## 2) Code Style
+
 - Use named exports when possible.
 - Co-locate types: `types/` for shared, local `type.ts` per feature.
 - File names: `kebab-case.tsx` for components, no index barrels unless asked.
@@ -44,13 +48,16 @@ public/
 - Accessibility: semantic tags, labelled inputs, keyboard nav.
 
 ESLint/Prettier:
+
 - Keep default Next.js ESLint base, `prettier` for formatting.
 - Fix all warnings introduced by your changes.
 
 ---
 
 ## 3) Git & Commits
+
 **Conventional Commits**; keep messages concise:
+
 - `feat: add projects list page`
 - `fix: handle null session in supabaseServer`
 - `chore: configure tailwind and globals`
@@ -61,6 +68,7 @@ If you touch multiple concerns, split into multiple commits.
 ---
 
 ## 4) Tasks You Are Allowed To Do
+
 - Create/modify files across the workspace.
 - Add minimal dependencies (pnpm) with justification in the PR body.
 - Create scaffolding for new features (routing, types, components).
@@ -70,6 +78,7 @@ If you touch multiple concerns, split into multiple commits.
 ---
 
 ## 5) Tasks You Must Avoid
+
 - Do NOT commit secrets or `.env*`.
 - Do NOT change package manager (must stay **pnpm**).
 - Do NOT introduce heavy UI kits without approval.
@@ -78,6 +87,7 @@ If you touch multiple concerns, split into multiple commits.
 ---
 
 ## 6) Supabase
+
 - Client files:
   - `lib/supabaseClient.ts`
   - `lib/supabaseServer.ts`
@@ -90,6 +100,7 @@ If you touch multiple concerns, split into multiple commits.
 ---
 
 ## 7) DX Utilities To Add (if missing)
+
 - `.gitignore` (node, next, env)
 - `.editorconfig`
 - `README.md` with run instructions
@@ -100,7 +111,8 @@ If you touch multiple concerns, split into multiple commits.
 ## 8) Default Scaffolds
 
 ### Page scaffold
-```tsx
+
+````tsx
 // app/(group)/example/page.tsx
 export default function Page() {
   return (
@@ -291,3 +303,4 @@ SUPABASE_SERVICE_ROLE_KEY= # server-only (do not expose)
 # Run after repo creation
 pnpm dlx create-next-app@latest . --ts --eslint --tailwind --app --src-dir=false --import-alias "@/*"
 pnpm add @supabase/supabase-js @supabase/ssr
+````

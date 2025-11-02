@@ -47,8 +47,15 @@ export default function GoogleEventsClient() {
   return (
     <div className="space-y-4">
       <div className="flex gap-2">
-        <button onClick={startAuth} className="rounded bg-blue-600 text-white px-3 py-1">Connect Google Calendar</button>
-        <button onClick={loadEvents} className="rounded border px-3 py-1">Load Events</button>
+        <button
+          onClick={startAuth}
+          className="rounded bg-blue-600 text-white px-3 py-1"
+        >
+          Connect Google Calendar
+        </button>
+        <button onClick={loadEvents} className="rounded border px-3 py-1">
+          Load Events
+        </button>
       </div>
 
       {loading && <div>Loading…</div>}
@@ -56,11 +63,15 @@ export default function GoogleEventsClient() {
 
       {events && (
         <ul className="space-y-2">
-          {events.length === 0 && <li className="text-sm text-gray-500">No upcoming events</li>}
+          {events.length === 0 && (
+            <li className="text-sm text-gray-500">No upcoming events</li>
+          )}
           {events.map((ev: any) => (
             <li key={ev.id} className="p-2 border rounded">
               <div className="font-medium">{ev.summary || "(No title)"}</div>
-              <div className="text-sm text-gray-500">{ev.start?.dateTime || ev.start?.date || ""}</div>
+              <div className="text-sm text-gray-500">
+                {ev.start?.dateTime || ev.start?.date || ""}
+              </div>
             </li>
           ))}
         </ul>
