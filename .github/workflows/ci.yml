@@ -1,96 +1,14 @@
 name: CI
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-  workflow_dispatch:
-
-permissions:
-  contents: read
-
-concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Use PNPM
-        uses: pnpm/action-setup@v4
-        with:
-          run_install: false
-
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Lint
-        run: pnpm lint
-
-      - name: Typecheck
-        run: pnpm typecheck
-
-      - name: Build
-        env:
-          NEXT_TELEMETRY_DISABLED: "1"
-        run: pnpm build
-
-  analyze:
-    if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Use PNPM
-        uses: pnpm/action-setup@v4
-        with:
-          run_install: false
-
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Install analyzer dependency
-        run: pnpm add -D @next/bundle-analyzer
-
-      - name: Build with analyzer
-        env:
-          NEXT_TELEMETRY_DISABLED: "1"
-          ANALYZE: "true"
-        run: pnpm analyze
-
-      - name: Upload analyze artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: analyze-report
-          path: |
-            .next/analyze
-            .next/static/chunks/**/*.js
-          if-no-files-found: ignore
-name: CI
-
-on:
   pull_request:
     branches: ["**"]
   push:
     branches: ["main", "master", "dev", "develop"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -109,6 +27,7 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           version: 9
+          run_install: false
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -130,3 +49,43 @@ jobs:
 
       - name: Test
         run: pnpm -s test -- --run
+
+  analyze:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    env:
+      NEXT_TELEMETRY_DISABLED: 1
+      ANALYZE: "true"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use PNPM
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install analyzer dependency (optional)
+        run: pnpm add -D @next/bundle-analyzer
+
+      - name: Build with analyzer
+        run: pnpm -s analyze
+
+      - name: Upload analyze artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: analyze-report
+          path: |
+            .next/analyze
+            .next/static/chunks/**/*.js
+          if-no-files-found: ignore
