@@ -5,7 +5,7 @@
  * responses based on user personality, mood, and workload context.
  */
 
-import { openai } from "./openaiClient";
+import { getOpenAI } from "./openaiClient";
 
 // =============================================================================
 // TYPES
@@ -108,7 +108,7 @@ const PERSONALITY_STYLES: Record<PersonalityType, {
  */
 export async function analyzeMessageTone(message: string): Promise<ToneAnalysis> {
   try {
-    const response = await openai.chat.completions.create({
+  const response = await getOpenAI().chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         {
@@ -151,7 +151,7 @@ Respond ONLY with JSON: { "clarity": 0.8, "empathy": 0.6, "urgency": 0.3, "suppo
  */
 export async function detectSentiment(message: string): Promise<MessageSentiment> {
   try {
-    const response = await openai.chat.completions.create({
+  const response = await getOpenAI().chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         {
@@ -233,7 +233,7 @@ Rules:
 - Avoid corporate jargon or empty positivity`;
 
   try {
-    const response = await openai.chat.completions.create({
+  const response = await getOpenAI().chat.completions.create({
       model: "gpt-4o",
       messages: [
         { role: "system", content: systemPrompt },
@@ -276,7 +276,7 @@ ${context.workload === "high" || context.workload === "overwhelmed"
   : "Keep it concise but complete (3-5 sentences)."}`;
 
   try {
-    const response = await openai.chat.completions.create({
+  const response = await getOpenAI().chat.completions.create({
       model: "gpt-4o",
       messages: [
         { role: "system", content: systemPrompt },

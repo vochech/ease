@@ -2,10 +2,6 @@ import { supabaseServer } from "@/lib/supabaseServer";
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 type Message = {
   role: "assistant" | "user";
   content: string;
@@ -136,8 +132,9 @@ Odpověz ve formátu JSON:`;
     }
     */
 
-    // Call OpenAI
-    const completion = await openai.chat.completions.create({
+  // Call OpenAI (lazy init; throws if key missing)
+  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  const completion = await client.chat.completions.create({
       model: "gpt-4-turbo-preview",
       messages: [
         { role: "system", content: systemPrompt },
