@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { supabaseServer } from "@/lib/supabaseServer";
 import { PeopleAnalyticsDashboard } from "@/components/people-analytics-dashboard";
-import { getOrgSubscription, checkFeatureAccess } from "@/lib/visibility";
+import { getOrgSubscription, checkFeatureAccess } from "@/lib/visibility-server";
 import { UpgradePrompt } from "@/components/upgrade-prompt";
 
 export const metadata: Metadata = {

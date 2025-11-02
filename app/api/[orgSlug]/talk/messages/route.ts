@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabaseServer";
-import { checkFeatureAccess } from "@/lib/visibility";
+import { checkFeatureAccess } from "@/lib/visibility-server";
 import { analyzeMessageTone, detectSentiment } from "@/lib/ai-mediator";
 
 export async function GET(

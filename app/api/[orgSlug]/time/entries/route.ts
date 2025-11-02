@@ -1,6 +1,6 @@
 import { supabaseServer } from "@/lib/supabaseServer";
 import { NextRequest, NextResponse } from "next/server";
-import { requireFeatureAccess, checkFeatureAccess } from "@/lib/visibility";
+import { requireFeatureAccess, checkFeatureAccess } from "@/lib/visibility-server";
 
 /**
  * List time entries with filters

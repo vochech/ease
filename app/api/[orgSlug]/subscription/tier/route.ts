@@ -1,6 +1,6 @@
 import { supabaseServer } from "@/lib/supabaseServer";
 import { NextRequest, NextResponse } from "next/server";
-import { getOrgSubscription } from "@/lib/visibility";
+import { getOrgSubscription } from "@/lib/visibility-server";
 
 // GET: Get current organization subscription tier
 export async function GET(

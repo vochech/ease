@@ -1,6 +1,6 @@
 import { supabaseServer } from "@/lib/supabaseServer";
 import { NextRequest, NextResponse } from "next/server";
-import { getUserFeatures } from "@/lib/visibility";
+import { getUserFeatures } from "@/lib/visibility-server";
 
 // GET: Get all accessible features for current user
 export async function GET(

@@ -1,6 +1,6 @@
 import { supabaseServer } from "@/lib/supabaseServer";
 import { NextRequest, NextResponse } from "next/server";
-import { requireFeatureAccess } from "@/lib/visibility";
+import { requireFeatureAccess } from "@/lib/visibility-server";
 
 /**
  * Start a new timer for the current user

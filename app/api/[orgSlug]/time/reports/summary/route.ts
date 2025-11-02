@@ -1,6 +1,6 @@
 import { supabaseServer } from "@/lib/supabaseServer";
 import { NextRequest, NextResponse } from "next/server";
-import { checkFeatureAccess } from "@/lib/visibility";
+import { checkFeatureAccess } from "@/lib/visibility-server";
 
 /**
  * Get time summary report

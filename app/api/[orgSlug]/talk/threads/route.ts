@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabaseServer";
-import { checkFeatureAccess } from "@/lib/visibility";
+import { checkFeatureAccess } from "@/lib/visibility-server";
 
 export async function GET(
   req: NextRequest,

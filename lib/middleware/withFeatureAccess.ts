@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { supabaseServer } from "@/lib/supabaseServer";
-import { requireFeatureAccess } from "@/lib/visibility";
+import { requireFeatureAccess } from "@/lib/visibility-server";
 
 /**
  * Higher-order route handler to enforce feature access before executing the handler.

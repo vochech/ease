@@ -1,6 +1,6 @@
 import { supabaseServer } from "@/lib/supabaseServer";
 import { NextRequest, NextResponse } from "next/server";
-import { checkFeatureAccess } from "@/lib/visibility";
+import { checkFeatureAccess } from "@/lib/visibility-server";
 
 // GET: Check if user has access to a specific feature
 export async function GET(

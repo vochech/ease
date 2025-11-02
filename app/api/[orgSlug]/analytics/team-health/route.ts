@@ -1,6 +1,6 @@
 import { supabaseServer } from "@/lib/supabaseServer";
 import { NextRequest, NextResponse } from "next/server";
-import { checkFeatureAccess, getOrgSubscription } from "@/lib/visibility";
+import { checkFeatureAccess, getOrgSubscription } from "@/lib/visibility-server";
 
 // GET: Fetch team health overview (managers only)
 export async function GET(
